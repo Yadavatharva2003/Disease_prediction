@@ -26,7 +26,7 @@ class _SignUpState extends State<SignUp> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Sign Up'),
-        backgroundColor: Colors.red[200], // Match with the Login page
+        backgroundColor: Colors.blue[200], // Match with the Login page
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -115,7 +115,7 @@ class _SignUpState extends State<SignUp> {
                 onPressed: _signUp,
                 child: Text('Sign Up'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red[200], // Match with the Login page
+                  backgroundColor: Colors.blue[200], // Match with the Login page
                 ),
               ),
             ],

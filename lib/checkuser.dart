@@ -1,5 +1,6 @@
 import 'package:disease_prediction/Home.dart';
 import 'package:disease_prediction/Login.dart';
+import 'package:disease_prediction/splashscreen.dart';
 import 'package:disease_prediction/users.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +27,7 @@ class _CheckUserState extends State<CheckUser> {
     if (user != null) {
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) =>Home()));
     } else {
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Login()));
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => SplashScreen ()));
     }
     setState(() {
       _isLoading = false;

@@ -1,11 +1,14 @@
 import 'dart:math';
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:disease_prediction/Login.dart';
 import 'package:disease_prediction/history.dart';
 import 'package:disease_prediction/input.dart';
 import 'package:disease_prediction/patient.dart';
+import 'package:disease_prediction/reminder.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -26,8 +29,7 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     _getUserName(); // Fetch the user's name when the widget initializes
-    _fetchUserBMI(); // Fetch the user's BMI when the widget initializes
-  }
+   }
 
   Future<void> _getUserName() async {
     try {
@@ -41,21 +43,7 @@ class _HomeState extends State<Home> {
     }
   }
 
-  Future<void> _fetchUserBMI() async {
-    try {
-      DocumentSnapshot<Map<String, dynamic>> bmiDoc = await _firestore
-          .collection('users')
-          .doc(_auth.currentUser!.uid)
-          .collection('medical')
-          .doc('bmi')
-          .get();
-      setState(() {
-        _userBMI = double.parse(bmiDoc.get('bmi'));
-      });
-    } catch (e) {
-      print('Error retrieving user BMI: $e');
-    }
-  }
+
 
   String _userInitials(String name) {
     if (name.isNotEmpty) {
@@ -91,38 +79,50 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home'),
+        backgroundColor: Colors.blue[200],
+        toolbarHeight: 250,
+        flexibleSpace: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Image.asset(
+                  'assets/logo.png',
+                  width: 200,
+                  height: 190,
+                ),
+              ),
+            ),
+            AnimatedTextKit(
+              animatedTexts: [
+                TypewriterAnimatedText(
+                  'Welcome, $_userName',
+                  textStyle: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  speed: Duration(milliseconds: 200),
+                ),
+              ],
+            ),
+          ],
+        ),
         leading: Builder(
           builder: (context) => IconButton(
             icon: CircleAvatar(
               child: Text(
-                _userInitials(_userName), // Display user's initials dynamically
+                _userInitials(_userName),
                 style: TextStyle(color: Colors.white),
               ),
               backgroundColor: _generateRandomColor(),
             ),
+            alignment: Alignment.topLeft,
             onPressed: () {
-              Scaffold.of(context).openDrawer(); // Open the side drawer
+              Scaffold.of(context).openDrawer();
             },
           ),
         ),
-        actions: [
-          // Navigate to the input page with slide transition animation
-          IconButton(
-            icon: Icon(Icons.input),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => InputPage()),
-              );
-            },
-          ),
-          // Logout button
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: _signOut,
-          ),
-        ],
       ),
       drawer: Drawer(
         child: ListView(
@@ -154,143 +154,104 @@ class _HomeState extends State<Home> {
                     MaterialPageRoute(builder: (context) => History()));
               },
             ),
+            ListTile(
+              title: Text('Logout'),
+              onTap: _signOut,
+            ),
           ],
         ),
-      ),
-      body: Stack(
-        children: [
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Welcome to the Home Page'),
-                SizedBox(height: 20),
-                Text('Your BMI: $_userBMI'),
-              ],
-            ),
-          ),
-          Positioned(
-            top: 20,
-            right: 20,
-            child: SizedBox(
-              width: 200,
-              height: 200,
-              child: BMIMeter(bmi: _userBMI),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-class BMIMeter extends StatelessWidget {
-  final double bmi;
-
-  BMIMeter({required this.bmi});
-
-  String _getBMICategory(double bmi) {
-    if (bmi < 18.5) {
-      return 'Underweight';
-    } else if (bmi >= 18.5 && bmi < 24.9) {
-      return 'Normal';
-    } else if (bmi >= 24.9 && bmi < 29.9) {
-      return 'Obese';
-    } else {
-      return 'Over Obese';
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.center,
+      ),body: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(
-          width: 200,
-          height: 200,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: RadialGradient(
-              colors: [
-                Colors.white.withOpacity(0.5),
-                Colors.white.withOpacity(0.2),
-              ],
-              stops: [0.5, 1.0],
-            ),
-          ),
-        ),
-        Container(
-          width: 180,
-          height: 180,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              colors: [
-                bmi < 18.5 ? Colors.blue : Colors.transparent,
-                bmi >= 18.5 && bmi < 24.9 ? Colors.green : Colors.transparent,
-                bmi >= 24.9 && bmi < 29.9 ? Colors.orangeAccent : Colors.transparent, // Change the color here
-                bmi >= 29.9 ? Colors.red : Colors.transparent,
-              ],
-              stops: [0.0, 0.33, 0.67, 1.0],
-              begin: Alignment.bottomLeft,
-              end: Alignment.topRight,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.5),
-                spreadRadius: 2,
-                blurRadius: 3,
-                offset: Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Container(
-                width: 140,
-                height: 140,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withOpacity(0.5),
+        Row(
+          children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => InputPage()),
+                  );
+                },
+                child: Card(
+                  color:Colors.blue[200],
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Health Overview',
+                          style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          'Know your health.',
+                          style: TextStyle(fontSize: 16.0),
+                        ),
+                        // Add more reminder details here if needed
+                      ],
+                    ),
+                  ),
                 ),
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'BMI',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+            ),
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ReminderPage()),
+                  );
+                },
+                child: Card(
+                  color:Colors.blue[200],
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Medicine Reminder',
+                          style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          'Take your medicine at the prescribed time.',
+                          style: TextStyle(fontSize: 16.0),
+                        ),
+                        // Add more reminder details here if needed
+                      ],
                     ),
                   ),
-                  SizedBox(height: 8),
-                  Text(
-                    bmi.toStringAsFixed(1),
-                    style: TextStyle(
-                      fontSize: 32,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    _getBMICategory(bmi),
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-
+        SizedBox(height: 20),
+        CarouselSlider(
+          options: CarouselOptions(
+            height: 200,
+            enlargeCenterPage: true,
+            autoPlay: true,
+            aspectRatio: 16 / 9,
+            autoPlayCurve: Curves.fastOutSlowIn,
+            enableInfiniteScroll: true,
+            autoPlayAnimationDuration: Duration(milliseconds: 800),
+            viewportFraction: 0.8,
+          ),
+          items: [
+            // Add your image widgets here
+            Image.network('assets/R.png', fit: BoxFit.cover),
+            Image.network('assets/R.png', fit: BoxFit.cover),
+            Image.network('assets/R.png', fit: BoxFit.cover),
+          ],
+        ),
       ],
+    ),
+
     );
   }
 }

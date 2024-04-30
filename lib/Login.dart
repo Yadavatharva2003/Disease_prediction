@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:disease_prediction/Home.dart';
 import 'package:disease_prediction/signup.dart';
+import 'package:flutter/services.dart'; // Add this import statement
+
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -15,7 +17,7 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn(
-    clientId: '1064371768312-lftsf6105thf1jmrn42pm5tgvds1m1q6.apps.googleusercontent.com',
+    clientId: '1064371768312-fep6pgr7os93qt60g5h3aejn9fa67b74.apps.googleusercontent.com'
   );
 
   final TextEditingController _emailController = TextEditingController();
@@ -28,84 +30,87 @@ class _LoginState extends State<Login> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Health App - Login'),
-        backgroundColor: Colors.red[200],
+        backgroundColor: Colors.blue[200],
       ),
-      body: _isLoading
-          ? Center(
-        child: CircularProgressIndicator(),
-      )
-          : Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextFormField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  icon: Icon(Icons.email),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
-                  }
-                  return null;
-                },
+      body: Center(
+        child: _isLoading
+            ? CircularProgressIndicator()
+            : SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextFormField(
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      icon: Icon(Icons.email),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your email';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 16.0),
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      icon: Icon(Icons.lock),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your password';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 16.0),
+                  ElevatedButton(
+
+                    onPressed: _login,
+                    child: Text('Login'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue[200],
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+                  TextButton(
+                    onPressed: _signUp,
+                    child: Text(
+                      'Don\'t have an account? Sign Up',
+                      style: TextStyle(color: Colors.blue[200]),
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+                  ElevatedButton.icon(
+                    onPressed: _signInWithGoogle,
+                    icon: Icon(
+                      Icons.add,
+                      size: 30,
+                    ),
+                    label: Text('Sign in with Google'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue[200],
+                    ),
+                  ),
+                  // Add a button for "Forgot Password"
+                  TextButton(
+                    onPressed: _forgotPassword,
+                    child: Text(
+                      'Forgot Password?',
+                      style: TextStyle(color: Colors.blue[200]),
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(height: 16.0),
-              TextFormField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  icon: Icon(Icons.lock),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: _login,
-                child: Text('Login'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red[200],
-                ),
-              ),
-              SizedBox(height: 16.0),
-              TextButton(
-                onPressed: _signUp,
-                child: Text(
-                  'Don\'t have an account? Sign Up',
-                  style: TextStyle(color: Colors.red[200]),
-                ),
-              ),
-              SizedBox(height: 16.0),
-              ElevatedButton.icon(
-                onPressed: _signInWithGoogle,
-                icon: Icon(
-                  Icons.add,
-                  size: 30,
-                ),
-                label: Text('Sign in with Google'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red[200],
-                ),
-              ),
-              // Add a button for "Forgot Password"
-              TextButton(
-                onPressed: _forgotPassword,
-                child: Text(
-                  'Forgot Password?',
-                  style: TextStyle(color: Colors.red[200]),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -165,14 +170,12 @@ class _LoginState extends State<Login> {
         );
 
         // Sign in to Firebase using the Google credentials
-        final UserCredential userCredential = await _auth.signInWithCredential(credential);
-
-        // Check if the user already exists
-        final bool isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
+        final UserCredential userCredential =
+        await _auth.signInWithCredential(credential);
 
         // Check if authentication is successful
         if (userCredential.user != null) {
-          if (isNewUser) {
+          if (userCredential.additionalUserInfo?.isNewUser ?? false) {
             // If the user is new, navigate to the Users page
             Navigator.pushReplacement(
               context,
@@ -193,11 +196,29 @@ class _LoginState extends State<Login> {
       }
     } catch (error) {
       print('Error signing in with Google: $error');
+      String errorMessage = 'An error occurred. Please try again later.';
+      if (error is PlatformException) {
+        switch (error.code) {
+          case 'network_error':
+            errorMessage = 'Network error. Please check your internet connection.';
+            break;
+          case 'sign_in_canceled':
+            errorMessage = 'Sign in canceled by user.';
+            break;
+          case 'account_selection_cancelled':
+            errorMessage = 'Account selection cancelled.';
+            break;
+          default:
+            errorMessage = 'Error: ${error.message}';
+        }
+      }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error signing in with Google: $error')),
+        SnackBar(content: Text(errorMessage)),
       );
     }
   }
+
+
 
 
   // Function to handle forgot password

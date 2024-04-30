@@ -120,7 +120,6 @@ class _HistoryState extends State<History> {
 
 
 
-
 class DetailsPage extends StatelessWidget {
   final DocumentSnapshot document;
 
@@ -155,7 +154,7 @@ class DetailsPage extends StatelessWidget {
               _buildDivider(),
               _buildSectionContent('Heart Rate', '${data?['heartRate'] ?? ''} bpm'),
               _buildDivider(),
-              _buildSectionContent('Symptoms', (data?['symptoms'] as List<dynamic>?)?.join(', ') ?? ''),
+              _buildSymptomsSection(data?['symptoms']),
               // Add more sections as needed
             ],
           ),
@@ -201,6 +200,28 @@ class DetailsPage extends StatelessWidget {
       color: Colors.grey[300],
       thickness: 1.0,
       height: 24.0,
+    );
+  }
+
+  Widget _buildSymptomsSection(List<dynamic>? symptoms) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionHeader('Symptoms'),
+        SizedBox(height: 8.0),
+        Container(
+          height: 100, // Set a fixed height for the symptoms list
+          child: ListView.builder(
+            itemCount: symptoms?.length ?? 0,
+            itemBuilder: (context, index) {
+              return Text(
+                '- ${symptoms?[index]}',
+                style: TextStyle(fontSize: 16),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
