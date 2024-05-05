@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -204,11 +206,10 @@ class _InputPageState extends State<InputPage> {
                   // Prepare data to be saved
                   Map<String, dynamic> inputData = {
                     'temperature': _temperatureController.text,
+                    'heartRate': _heartRateController.text,
                     'bloodPressure': _bloodPressureController.text,
                     'oxygenLevel': _oxygenLevelController.text,
-                    'heartRate': _heartRateController.text,
-                    'symptoms': _selectedSymptoms,
-                    'dateTime': Timestamp.now(), // Store current date and time
+
                   };
 
                   // Get current user ID
@@ -217,11 +218,18 @@ class _InputPageState extends State<InputPage> {
                   // Save data to Firestore and navigate to DiagnosticReportPage
                   if (userId != null) {
                     try {
+                      // Make API call to predict disease
+                      var prediction = await predictDisease(inputData);
+
+                      // Save data to Firestore
                       await FirebaseFirestore.instance
                           .collection('users') // Assuming 'users' is the collection where users' data is stored
                           .doc(userId)
                           .collection('medical') // Sub-collection named 'medical' for storing medical data
-                          .add(inputData);
+                          .add({
+                        ...inputData,
+                        'predictedDisease': prediction,
+                      });
 
                       // Navigate to the next screen after data is successfully saved
                       Navigator.pushReplacement(
@@ -368,5 +376,31 @@ class _InputPageState extends State<InputPage> {
     } else {
       return null;
     }
+  }
+}
+Future<String?> predictDisease(Map<String, dynamic> inputData) async {
+  // Replace 'YOUR_PREDICTION_API_ENDPOINT' with the actual endpoint URL
+  String predictionEndpoint = 'https://disease-prediction-pcfy.onrender.com/predict_model2';
+
+  try {
+    // Make POST request to prediction API endpoint
+    var response = await http.post(
+      Uri.parse(predictionEndpoint),
+      body: jsonEncode(inputData),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      // If the request is successful, return the predicted disease
+      return response.body;
+    } else {
+      // If there's an error with the request, print the response status code
+      print('Failed to predict disease: ${response.statusCode}');
+      return null;
+    }
+  } catch (e) {
+    // Catch any errors that occur during the request and print them
+    print('Failed to predict disease: $e');
+    return null;
   }
 }

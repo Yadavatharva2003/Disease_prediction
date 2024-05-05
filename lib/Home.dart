@@ -173,25 +173,26 @@ class _HomeState extends State<Home> {
                     MaterialPageRoute(builder: (context) => InputPage()),
                   );
                 },
-                child: Card(
-                  color:Colors.blue[200],
-                  child: Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Column(
-
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Health Overview',
-                          style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          'Know your health.',
-                          style: TextStyle(fontSize: 16.0),
-                        ),
-                        // Add more reminder details here if needed
-                      ],
+                child: Container(
+                  height: 200, // Adjust the height as needed
+                  child: Card(
+                    color: Colors.blue[200],
+                    child: Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Health Overview',
+                            style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            'Know your health.',
+                            style: TextStyle(fontSize: 16.0),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -205,24 +206,26 @@ class _HomeState extends State<Home> {
                     MaterialPageRoute(builder: (context) => ReminderPage()),
                   );
                 },
-                child: Card(
-                  color:Colors.blue[200],
-                  child: Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Medicine Reminder',
-                          style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          'Take your medicine at the prescribed time.',
-                          style: TextStyle(fontSize: 16.0),
-                        ),
-                        // Add more reminder details here if needed
-                      ],
+                child: Container(
+                  height: 200, // Adjust the height as needed
+                  child: Card(
+                    color: Colors.blue[200],
+                    child: Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Medicine Reminder',
+                            style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            'Take your medicine at the prescribed time.',
+                            style: TextStyle(fontSize: 16.0),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -230,6 +233,7 @@ class _HomeState extends State<Home> {
             ),
           ],
         ),
+
         SizedBox(height: 20),
         CarouselSlider(
           options: CarouselOptions(
@@ -243,10 +247,14 @@ class _HomeState extends State<Home> {
             viewportFraction: 0.8,
           ),
           items: [
-            // Add your image widgets here
-            Image.network('assets/R.png', fit: BoxFit.cover),
-            Image.network('assets/R.png', fit: BoxFit.cover),
-            Image.network('assets/R.png', fit: BoxFit.cover),
+            Image.asset('assets/1.jpg', fit: BoxFit.cover),
+            Image.asset('assets/2.jpg', fit: BoxFit.cover),
+            Image.asset('assets/3.jpg', fit: BoxFit.cover),
+            Image.asset('assets/4.jpg', fit: BoxFit.cover),
+            Image.asset('assets/5.jpg', fit: BoxFit.cover),
+            Image.asset('assets/6.jpg', fit: BoxFit.cover),
+            Image.asset('assets/7.jpg', fit: BoxFit.cover),
+
           ],
         ),
       ],

@@ -8,70 +8,67 @@ class ReminderPage extends StatefulWidget {
 }
 
 class _ReminderPageState extends State<ReminderPage> {
-  final TextEditingController _patientNameController = TextEditingController();
-  final TextEditingController _medicineNameController = TextEditingController();
-  final TextEditingController _dosageController = TextEditingController();
-  final TextEditingController _timingController = TextEditingController();
-  final TextEditingController _startDateController = TextEditingController();
-  final TextEditingController _endDateController = TextEditingController();
-  final TextEditingController _frequencyController = TextEditingController();
-  final TextEditingController _notesController = TextEditingController();
+  final List<Medicine> medicines = [];
+
+  TextEditingController patientNameController = TextEditingController();
+  TextEditingController medicineNameController = TextEditingController();
+  TextEditingController dosageController = TextEditingController();
+  TextEditingController timingController = TextEditingController();
 
   void _showAddReminderDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Add Reminder'),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: _patientNameController,
-                  decoration: InputDecoration(labelText: 'Patient Name'),
-                ),
-                SizedBox(height: 8),
-                TextField(
-                  controller: _medicineNameController,
-                  decoration: InputDecoration(labelText: 'Medicine Name'),
-                ),
-                SizedBox(height: 8),
-                TextField(
-                  controller: _dosageController,
-                  decoration: InputDecoration(labelText: 'Dosage'),
-                ),
-                SizedBox(height: 8),
-                TextField(
-                  controller: _timingController,
-                  decoration: InputDecoration(labelText: 'Timing'),
-                ),
-                SizedBox(height: 8),
-                TextField(
-                  controller: _startDateController,
-                  decoration: InputDecoration(labelText: 'Start Date'),
-                ),
-                SizedBox(height: 8),
-                TextField(
-                  controller: _endDateController,
-                  decoration: InputDecoration(labelText: 'End Date'),
-                ),
-                SizedBox(height: 8),
-                TextField(
-                  controller: _frequencyController,
-                  decoration: InputDecoration(labelText: 'Frequency'),
-                ),
-                SizedBox(height: 8),
-                TextField(
-                  controller: _notesController,
-                  decoration: InputDecoration(labelText: 'Notes'),
-                ),
-              ],
-            ),
+          title: Text('Add Medicine'),
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: patientNameController,
+                    decoration: InputDecoration(labelText: 'Patient Name'),
+                  ),
+                  SizedBox(height: 8),
+                  TextField(
+                    controller: medicineNameController,
+                    decoration: InputDecoration(labelText: 'Medicine Name'),
+                  ),
+                  SizedBox(height: 8),
+                  TextField(
+                    controller: dosageController,
+                    decoration: InputDecoration(labelText: 'Dosage'),
+                  ),
+                  SizedBox(height: 8),
+                  TextField(
+                    controller: timingController,
+                    decoration: InputDecoration(labelText: 'Timing'),
+                  ),
+                  SizedBox(height: 8),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        medicines.add(Medicine(
+                          patientName: patientNameController.text,
+                          medicineName: medicineNameController.text,
+                          dosage: dosageController.text,
+                          timing: timingController.text,
+                        ));
+                        medicineNameController.clear();
+                        dosageController.clear();
+                        timingController.clear();
+                      });
+                    },
+                    child: Text('Add Medicine'),
+                  ),
+                ],
+              );
+            },
           ),
           actions: [
-            TextButton(
+            ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -79,21 +76,9 @@ class _ReminderPageState extends State<ReminderPage> {
             ),
             ElevatedButton(
               onPressed: () {
-                // Add functionality to save the reminder
-                // You can access the entered values using the respective controllers
-                String patientName = _patientNameController.text;
-                String medicineName = _medicineNameController.text;
-                String dosage = _dosageController.text;
-                String timing = _timingController.text;
-                String startDate = _startDateController.text;
-                String endDate = _endDateController.text;
-                String frequency = _frequencyController.text;
-                String notes = _notesController.text;
-
-                // You can add code here to save the reminder
-                // For example, you can add the reminder to a list of reminders or store it in a database
-
-                // After saving the reminder, close the dialog
+                // Add functionality to save the reminders
+                // You can access the entered values using the medicines list
+                // For example, you can save the list of medicines to a database
                 Navigator.pop(context);
               },
               child: Text('Save'),
@@ -116,27 +101,35 @@ class _ReminderPageState extends State<ReminderPage> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Add your list of reminders here
-          ],
-        ),
+      body: ListView.builder(
+        itemCount: medicines.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text('Patient Name: ${medicines[index].patientName}'),
+            subtitle: Text('Medicine: ${medicines[index].medicineName}, Dosage: ${medicines[index].dosage}, Timing: ${medicines[index].timing}'),
+          );
+        },
       ),
     );
   }
+}
 
-  @override
-  void dispose() {
-    _patientNameController.dispose();
-    _medicineNameController.dispose();
-    _dosageController.dispose();
-    _timingController.dispose();
-    _startDateController.dispose();
-    _endDateController.dispose();
-    _frequencyController.dispose();
-    _notesController.dispose();
-    super.dispose();
-  }
+class Medicine {
+  final String patientName;
+  final String medicineName;
+  final String dosage;
+  final String timing;
+
+  Medicine({
+    required this.patientName,
+    required this.medicineName,
+    required this.dosage,
+    required this.timing,
+  });
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: ReminderPage(),
+  ));
 }
